@@ -83,40 +83,27 @@ export class AppComponent implements AfterViewInit {
     //Loading of the home test image - img1
     var img1 = new Image();
     this.ctx = this.canvasEl.nativeElement.getContext('2d');
-    var ct = this.ctx;  
-    var products = this.products;
     //drawing of the test image - img1
-    img1.onload = function () {
+    img1.onload = ()=> {
         //draw background image
-        ct.drawImage(img1, 0, 0, 500,500);
+        this.ctx.width = img1.width;
+        this.ctx.height = img1.height;
+        this.ctx.drawImage(img1, 0, 0);
         //draw a box over the top
         // ct.fillStyle = "rgba(200, 0, 0, 0.5)";
         // ct.fillRect(0, 0, 50, 50);
-
-        products.forEach(function(data){
-          ct.fillStyle = "red";
-          ct.fillRect(data.x, data.y, data.width, data.height);
-        })
+        for(let i=0;i <this.products.length;i++){
+        // this.products.forEach((data) => {
+          console.log(this.products[i]);
+          // this.ctx.fillStyle = "red";
+          // this.ctx.fillRect(this.products[0].x, this.products[0].y, this.products[0].width, this.products[0].height);
+          this.ctx.beginPath();
+          this.ctx.rect(this.products[i].x, this.products[i].y, this.products[i].width, this.products[i].height);
+          this.ctx.stroke();
+        }
     };
     img1.src = 'https://storage.googleapis.com/snap2insight-livedemo/assessment/test_image.jpg';
-
-    // this.plotOnCanvas();
   }
-
-  buttonCLick(){
-    this.ctx.beginPath();
-    this.ctx.rect(20, 20, 150, 100);
-    this.ctx.stroke();
-  }
-
-  // plotOnCanvas(){
-  //   var canvasEl = this.canvasEl.nativeElement.getContext('2d');
-  //   this.products.forEach(function(data){
-  //     canvasEl.fillStyle = "red";
-  //     canvasEl.fillRect(data.x, data.y, data.width, data.height);
-  //   })
-  // }
-
   onOptionsSelected(valueSelected){
   
     let index, saveVar;
