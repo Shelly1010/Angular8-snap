@@ -1,0 +1,23 @@
+.mainContainer{
+   .header{
+    padding: 10px;
+    border-bottom: 1px solid #e0e0e0;
+    }
+    .table{
+    padding-top: 20px;
+    }
+    .rm-padding{
+        padding: 0;
+    } 
+    .imageContainer{
+        width: 100%;
+        padding-top: 20px;
+    }
+    .nav-tabs{
+        width: 100%;
+
+        .nav-link{
+            cursor: pointer;
+        }
+    }
+}
