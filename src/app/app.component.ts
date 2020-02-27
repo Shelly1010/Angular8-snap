@@ -26,10 +26,10 @@ export class AppComponent implements AfterViewInit {
   height = 400;
   tableValues:any =[];
   uniqueBrands:any =[];
+  ctx:any = [];
 
 
-  @ViewChild('canvas', { static: true })
-  canvas: ElementRef<HTMLCanvasElement>;
+  @ViewChild('canvas', { static: true }) canvasEl: ElementRef
 
   constructor() {
     //table values
@@ -82,18 +82,40 @@ export class AppComponent implements AfterViewInit {
   ngAfterViewInit(){
     //Loading of the home test image - img1
     var img1 = new Image();
-    var ctx = this.canvas.nativeElement.getContext('2d');
+    this.ctx = this.canvasEl.nativeElement.getContext('2d');
+    var ct = this.ctx;  
+    var products = this.products;
     //drawing of the test image - img1
     img1.onload = function () {
         //draw background image
-        ctx.drawImage(img1, 0, 0);
+        ct.drawImage(img1, 0, 0, 500,500);
         //draw a box over the top
-        ctx.fillStyle = "rgba(200, 0, 0, 0.5)";
-        ctx.fillRect(0, 0, 500, 500);
+        // ct.fillStyle = "rgba(200, 0, 0, 0.5)";
+        // ct.fillRect(0, 0, 50, 50);
 
+        products.forEach(function(data){
+          ct.fillStyle = "red";
+          ct.fillRect(data.x, data.y, data.width, data.height);
+        })
     };
     img1.src = 'https://storage.googleapis.com/snap2insight-livedemo/assessment/test_image.jpg';
+
+    // this.plotOnCanvas();
   }
+
+  buttonCLick(){
+    this.ctx.beginPath();
+    this.ctx.rect(20, 20, 150, 100);
+    this.ctx.stroke();
+  }
+
+  // plotOnCanvas(){
+  //   var canvasEl = this.canvasEl.nativeElement.getContext('2d');
+  //   this.products.forEach(function(data){
+  //     canvasEl.fillStyle = "red";
+  //     canvasEl.fillRect(data.x, data.y, data.width, data.height);
+  //   })
+  // }
 
   onOptionsSelected(valueSelected){
   
