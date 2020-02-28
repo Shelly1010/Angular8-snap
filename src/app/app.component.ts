@@ -27,11 +27,14 @@ export class AppComponent implements AfterViewInit {
   tableValues:any =[];
   uniqueBrands:any =[];
   ctx:any = [];
+  canvasWidth = 500;
+  canvasHeight = 500;
 
 
   @ViewChild('canvas', { static: true }) canvasEl: ElementRef
 
   constructor() {
+
     //table values
     var groups = new Set(this.products.map(item => item.upc));
     this.tableValues = [];
@@ -80,25 +83,23 @@ export class AppComponent implements AfterViewInit {
   }
 
   ngAfterViewInit(){
+    this.ctx = this.canvasEl.nativeElement.getContext('2d');
+    this.canvasEl.nativeElement.width =  this.canvasWidth;
+    this.canvasEl.nativeElement.height =  this.canvasHeight;
     //Loading of the home test image - img1
     var img1 = new Image();
-    this.ctx = this.canvasEl.nativeElement.getContext('2d');
     //drawing of the test image - img1
     img1.onload = ()=> {
         //draw background image
-        this.ctx.width = img1.width;
-        this.ctx.height = img1.height;
-        this.ctx.drawImage(img1, 0, 0);
+        var ratioW = (img1.width/this.canvasWidth);
+        var ratioH = (img1.height/this.canvasHeight);
+        this.ctx.drawImage(img1, 0, 0, this.canvasWidth, this.canvasHeight);
+        
         //draw a box over the top
-        // ct.fillStyle = "rgba(200, 0, 0, 0.5)";
-        // ct.fillRect(0, 0, 50, 50);
         for(let i=0;i <this.products.length;i++){
-        // this.products.forEach((data) => {
-          console.log(this.products[i]);
-          // this.ctx.fillStyle = "red";
-          // this.ctx.fillRect(this.products[0].x, this.products[0].y, this.products[0].width, this.products[0].height);
           this.ctx.beginPath();
-          this.ctx.rect(this.products[i].x, this.products[i].y, this.products[i].width, this.products[i].height);
+          this.ctx.rect(this.products[i].x /ratioW, this.products[i].y/ratioH, this.products[i].width / ratioW, this.products[i].height /ratioH);
+          this.ctx.strokeStyle = "red";
           this.ctx.stroke();
         }
     };
