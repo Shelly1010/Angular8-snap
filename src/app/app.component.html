@@ -60,7 +60,7 @@
               </ng-container>
         
             <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-            <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+            <mat-row *matRowDef="let row; columns: displayedColumns;" (click)="getRecord(row)"></mat-row>
           </mat-table>
         
           <mat-paginator #paginator
@@ -68,31 +68,6 @@
                          [pageSizeOptions]="[5, 10, 20]"
                          [showFirstLastButtons]="true">
           </mat-paginator>
-      
-      <!-- <table class="table table-responsive">
-        <tr>
-            <th> UPC </th>
-            <th> Product Short Name </th>
-            <th> No of Facings </th>
-            <th> Brand Name </th>
-            <th> Shelf Level </th>
-        </tr>
-        <tr *ngFor="let data of tableValues; let i = index">
-            <td class="text-left">
-                {{data.name || '--'}}
-            </td>
-            <td class="text-left">
-              {{data.values[0].productShortName || '--'}}
-          </td>
-            <td class="text-left">{{data.values.length}}</td>
-          <td class="text-left">
-          {{data.values[0].brandName || '--'}}
-          </td>
-          <td class="text-left">
-            {{data.values[0].shelfLevel || '--'}}
-          </td>
-        </tr>
-    </table> -->
     </div>
     
   </div>

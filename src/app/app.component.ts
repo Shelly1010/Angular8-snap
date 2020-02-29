@@ -31,6 +31,9 @@ export class AppComponent implements AfterViewInit {
   canvasHeight = 700;
   dataSourceArray: any = [];
   dataLength: any=0;
+  ratioH: number = 0;
+  ratioW: number = 0;
+  img1: any;
 
   displayedColumns = ['upc', 'shortName', 'facings', 'brandName', 'shelfLevel'];
   dataSource: MatTableDataSource<Element>;
@@ -104,12 +107,23 @@ export class AppComponent implements AfterViewInit {
     this.dataSource.data = this.dataSourceArray;
     this.dataSource.paginator = this.paginator;
     this.dataLength = this.dataSourceArray.length;
-    
-
-    console.log(this.dataSource);
   }
   public doFilter = (value: string) => {
     this.dataSource.filter = value.trim().toLocaleLowerCase();
+  }
+  getRecord = (record)=>{
+    this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+    this.ctx.drawImage(this.img1, 0, 0,this.canvasWidth, this.canvasHeight);
+
+    let rowData = this.tableValues.filter(i => i.name === record.upc);
+
+    this.drawFunction();
+    this.ctx.beginPath();
+    this.ctx.rect(rowData[0].values[0].x /this.ratioW, rowData[0].values[0].y/this.ratioH, rowData[0].values[0].width / this.ratioW, rowData[0].values[0].height /this.ratioH);
+    this.ctx.lineWidth = 4;
+    this.ctx.strokeStyle = "yellow";
+    this.ctx.stroke();
+    
   }
 
   ngAfterViewInit(){
@@ -118,23 +132,18 @@ export class AppComponent implements AfterViewInit {
     this.canvasEl.nativeElement.width =  this.canvasWidth;
     this.canvasEl.nativeElement.height =  this.canvasHeight;
     //Loading of the home test image - img1
-    var img1 = new Image();
+    this.img1 = new Image();
     //drawing of the test image - img1
-    img1.onload = ()=> {
+    this.img1.onload = ()=> {
         //draw background image
-        var ratioW = (img1.width/this.canvasWidth);
-        var ratioH = (img1.height/this.canvasHeight);
-        this.ctx.drawImage(img1, 0, 0, this.canvasWidth, this.canvasHeight);
+        this.ratioW = (this.img1.width/this.canvasWidth);
+        this.ratioH = (this.img1.height/this.canvasHeight);
+        this.ctx.drawImage(this.img1, 0, 0, this.canvasWidth, this.canvasHeight);
         
         //draw a box over the top
-        for(let i=0;i <this.products.length;i++){
-          this.ctx.beginPath();
-          this.ctx.rect(this.products[i].x /ratioW, this.products[i].y/ratioH, this.products[i].width / ratioW, this.products[i].height /ratioH);
-          this.ctx.strokeStyle = "red";
-          this.ctx.stroke();
-        }
+        this.drawFunction();
     };
-    img1.src = 'https://storage.googleapis.com/snap2insight-livedemo/assessment/test_image.jpg';
+    this.img1.src = 'https://storage.googleapis.com/snap2insight-livedemo/assessment/test_image.jpg';
   }
   onOptionsSelected(valueSelected){
   
@@ -172,6 +181,16 @@ export class AppComponent implements AfterViewInit {
         ["Middle", (middleCount/totalFacings)*100],
         ["Bottom", (bottomCount/totalFacings)*100]
      ];
+  }
+
+  drawFunction(){
+    for(let i=0;i <this.products.length;i++){
+      this.ctx.beginPath();
+      this.ctx.rect(this.products[i].x /this.ratioW, this.products[i].y/this.ratioH, this.products[i].width / this.ratioW, this.products[i].height /this.ratioH);
+      this.ctx.lineWidth = 1;
+      this.ctx.strokeStyle = "red";
+      this.ctx.stroke();
+    }
   }
 }
 
