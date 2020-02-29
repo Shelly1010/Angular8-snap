@@ -27,8 +27,8 @@ export class AppComponent implements AfterViewInit {
   tableValues:any =[];
   uniqueBrands:any =[];
   ctx:any = [];
-  canvasWidth = 700;
-  canvasHeight = 700;
+  canvasWidth = 650;
+  canvasHeight = 650;
   dataSourceArray: any = [];
   dataLength: any=0;
   ratioH: number = 0;
@@ -37,9 +37,10 @@ export class AppComponent implements AfterViewInit {
 
   displayedColumns = ['upc', 'shortName', 'facings', 'brandName', 'shelfLevel'];
   dataSource: MatTableDataSource<Element>;
+
+  @ViewChild(MatPaginator,{static: true}) paginator: MatPaginator;
+  @ViewChild(MatSort,{static: true}) sort: MatSort;
   
-  @ViewChild(MatPaginator) paginator: MatPaginator;
-  @ViewChild(MatSort) sort: MatSort;
   @ViewChild('canvas', { static: true }) canvasEl: ElementRef
 
   constructor() {
