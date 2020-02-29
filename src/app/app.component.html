@@ -15,15 +15,61 @@
       </ul>
   </div>
 
-  <div class="row">
-    <div class="col-lg-4">
+  <div class="row" [hidden]="!section1">
+    <div class="col-lg-5">
        <canvas #canvas width="canvasWidth" height="canvasHeight"></canvas>
        
       <!-- <img class="imageContainer" src="https://storage.googleapis.com/snap2insight-livedemo/assessment/test_image.jpg"/> -->
     </div>
-    <div class="col-lg-8 rm-padding">
+    <div class="col-lg-7">
+
+        <div class="text-right">
+            <mat-form-field fxFlex="50%">
+              <input matInput type="text" (keyup)="doFilter($event.target.value)" placeholder="Filter">
+            </mat-form-field>
+          </div>
+        <mat-table #table [dataSource]="dataSource" matSort matSortStart="desc" *ngIf="dataSource">
+
+            
+            <ng-container matColumnDef="upc">
+              <mat-header-cell *matHeaderCellDef mat-sort-header> UPC </mat-header-cell>
+              <mat-cell *matCellDef="let element"> {{element.upc}} </mat-cell>
+            </ng-container>
+        
+            
+            <ng-container matColumnDef="shortName">
+              <mat-header-cell *matHeaderCellDef mat-sort-header> Product Short Name </mat-header-cell>
+              <mat-cell *matCellDef="let element"> {{element.shortName}} </mat-cell>
+            </ng-container>
+        
+           
+            <ng-container matColumnDef="facings">
+              <mat-header-cell *matHeaderCellDef mat-sort-header> No of Facings </mat-header-cell>
+              <mat-cell *matCellDef="let element"> {{element.facings}} </mat-cell>
+            </ng-container>
+        
+            
+            <ng-container matColumnDef="brandName">
+              <mat-header-cell *matHeaderCellDef mat-sort-header> Brand Name </mat-header-cell>
+              <mat-cell *matCellDef="let element"> {{element.brandName}} </mat-cell>
+            </ng-container>
+
+            <ng-container matColumnDef="shelfLevel">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> Shelf Level </mat-header-cell>
+                <mat-cell *matCellDef="let element"> {{element.shelfLevel}} </mat-cell>
+              </ng-container>
+        
+            <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+            <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+          </mat-table>
+        
+          <mat-paginator #paginator
+                         [pageSize]="10"
+                         [pageSizeOptions]="[5, 10, 20]"
+                         [showFirstLastButtons]="true">
+          </mat-paginator>
       
-      <table class="table table-responsive">
+      <!-- <table class="table table-responsive">
         <tr>
             <th> UPC </th>
             <th> Product Short Name </th>
@@ -46,12 +92,12 @@
             {{data.values[0].shelfLevel || '--'}}
           </td>
         </tr>
-    </table>
+    </table> -->
     </div>
     
   </div>
 
-  <div class="row" *ngIf="!section1">
+  <div class="row" [hidden]="section1">
       <google-chart #chart
       [title]="title"
       [type]="type"
