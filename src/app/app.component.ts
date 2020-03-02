@@ -1,7 +1,8 @@
 import { Component, ElementRef, ViewChild, OnInit, AfterViewInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http'; 
-import data  from '../assets/test_analysis.json';
+// import data  from '../assets/test_analysis.json';
+import { GetDataService } from './get-data.service';
 import {MatPaginator, MatSort, MatTableDataSource} from '@angular/material';
+import { CompileNgModuleMetadata } from '@angular/compiler';
 
 @Component({
   selector: 'app-root',
@@ -12,7 +13,8 @@ import {MatPaginator, MatSort, MatTableDataSource} from '@angular/material';
 export class AppComponent implements AfterViewInit {
   title = 'Top 5 brands';
   title2 = 'Brand';
-  products: any = data.ResultSet.row;
+  products: any = [];
+  // products: any = data.ResultSet.row;
   searchString = '';
   section1: boolean = true;
   type='PieChart';
@@ -34,18 +36,31 @@ export class AppComponent implements AfterViewInit {
   ratioH: number = 0;
   ratioW: number = 0;
   img1: any;
+  visible:boolean = false;    
 
   displayedColumns = ['upc', 'shortName', 'facings', 'brandName', 'shelfLevel'];
   dataSource: MatTableDataSource<Element>;
 
   @ViewChild(MatPaginator,{static: true}) paginator: MatPaginator;
-  @ViewChild(MatSort,{static: true}) sort: MatSort;
+  @ViewChild(MatSort,{static: false}) sort: MatSort;
   
   @ViewChild('canvas', { static: true }) canvasEl: ElementRef
 
-  constructor() {
+  constructor(private api: GetDataService) {
 
-    //table values
+  }
+
+  ngOnInit() {
+    this.dataSource = new MatTableDataSource<Element>();
+    this.api.getData()
+    .subscribe(data => {
+      this.products = data['ResultSet'].row;
+      this.calculateData();
+    });
+
+  }
+  public calculateData(){
+  //table values
     var groups = new Set(this.products.map(item => item.upc));
     this.tableValues = [];
     groups.forEach(g => 
@@ -65,6 +80,12 @@ export class AppComponent implements AfterViewInit {
         shelfLevel: this.tableValues[i].values[0].shelfLevel
       })
     }
+
+    this.dataSource = new MatTableDataSource(this.dataSourceArray);
+    this.dataSource.data = this.dataSourceArray;
+    this.dataSource.paginator = this.paginator;
+    this.dataLength = this.dataSourceArray.length;
+    this.dataSource.sort = this.sort;
 
     //for pie chart calculations ---- start------
     let brandsArray = this.products.map(a => a.brandName); //extract brandName key from array of objects & create an array
@@ -101,17 +122,41 @@ export class AppComponent implements AfterViewInit {
 
     //for bar chart calculations ---- start------
     this.uniqueBrands = brandsArray.filter((item, i, ar) => ar.indexOf(item) === i);
+
+     //draw a box over the top
+     this.drawFunction();
   }
 
-  ngOnInit() {
-    this.dataSource = new MatTableDataSource(this.dataSourceArray);
-    this.dataSource.data = this.dataSourceArray;
-    this.dataSource.paginator = this.paginator;
-    this.dataLength = this.dataSourceArray.length;
-  }
   public doFilter = (value: string) => {
     this.dataSource.filter = value.trim().toLocaleLowerCase();
+
+    if(this.dataSource.filter){
+      let updatedData = this.dataSource['_renderData']._value;
+      let updatedArray = [];
+      for(let j=0;j<updatedData.length;j++){
+        updatedArray.push(this.tableValues.filter(i => i.name === updatedData[j]['upc']))
+      }
+  
+      updatedArray = [].concat.apply([], updatedArray);
+      this.ctx.drawImage(this.img1, 0, 0, this.canvasWidth, this.canvasHeight);
+  
+      for(let i=0;i < updatedArray.length;i++){
+        for(let j=0;j < updatedArray[i].values.length;j++){
+          this.ctx.beginPath();
+          this.ctx.rect(updatedArray[i].values[j].x /this.ratioW, updatedArray[i].values[j].y/this.ratioH, updatedArray[i].values[j].width / this.ratioW, updatedArray[i].values[j].height /this.ratioH);
+          this.ctx.lineWidth = 1;
+          this.ctx.strokeStyle = "red";
+          this.ctx.stroke();
+        }
+      }
+    }
+    else{
+      this.drawFunction();
+    }
+
+    
   }
+
   getRecord = (record)=>{
     this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
     this.ctx.drawImage(this.img1, 0, 0,this.canvasWidth, this.canvasHeight);
@@ -119,19 +164,22 @@ export class AppComponent implements AfterViewInit {
     let rowData = this.tableValues.filter(i => i.name === record.upc);
 
     this.drawFunction();
-    this.ctx.beginPath();
-    this.ctx.rect(rowData[0].values[0].x /this.ratioW, rowData[0].values[0].y/this.ratioH, rowData[0].values[0].width / this.ratioW, rowData[0].values[0].height /this.ratioH);
-    this.ctx.lineWidth = 4;
-    this.ctx.strokeStyle = "yellow";
-    this.ctx.stroke();
+
+    for(let i=0;i<rowData[0].values.length;i++){
+      this.ctx.beginPath();
+      this.ctx.rect(rowData[0].values[i].x /this.ratioW, rowData[0].values[i].y/this.ratioH, rowData[0].values[i].width / this.ratioW, rowData[0].values[i].height /this.ratioH);
+      this.ctx.lineWidth = 4;
+      this.ctx.strokeStyle = "yellow";
+      this.ctx.stroke();
+    }
     
   }
 
   ngAfterViewInit(){
-    this.dataSource.sort = this.sort;
     this.ctx = this.canvasEl.nativeElement.getContext('2d');
     this.canvasEl.nativeElement.width =  this.canvasWidth;
     this.canvasEl.nativeElement.height =  this.canvasHeight;
+
     //Loading of the home test image - img1
     this.img1 = new Image();
     //drawing of the test image - img1
@@ -140,9 +188,6 @@ export class AppComponent implements AfterViewInit {
         this.ratioW = (this.img1.width/this.canvasWidth);
         this.ratioH = (this.img1.height/this.canvasHeight);
         this.ctx.drawImage(this.img1, 0, 0, this.canvasWidth, this.canvasHeight);
-        
-        //draw a box over the top
-        this.drawFunction();
     };
     this.img1.src = 'https://storage.googleapis.com/snap2insight-livedemo/assessment/test_image.jpg';
   }

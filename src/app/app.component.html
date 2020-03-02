@@ -16,12 +16,12 @@
   </div>
 
   <div class="row" [hidden]="!section1">
-    <div class="col-lg-5">
+    <div class="col">
        <canvas #canvas width="canvasWidth" height="canvasHeight"></canvas>
        
       <!-- <img class="imageContainer" src="https://storage.googleapis.com/snap2insight-livedemo/assessment/test_image.jpg"/> -->
     </div>
-    <div class="col-lg-7">
+    <div class="col">
 
         <div class="text-right">
             <mat-form-field fxFlex="50%">
@@ -73,17 +73,20 @@
   </div>
 
   <div class="row" [hidden]="section1">
+    <div class="col">
       <google-chart #chart
-      [title]="title"
-      [type]="type"
-      [data]="chartData"
-      [columnNames]="columnNames"
-      [options]="options"
-      [width]="width"
-      [height]="height">
-   </google-chart>
+            [title]="title"
+            [type]="type"
+            [data]="chartData"
+            [columnNames]="columnNames"
+            [options]="options"
+            [width]="width"
+            [height]="height">
+        </google-chart>
+    </div>  
+   
 
-   <div>
+   <div class="col">
      <h3>Select brand name</h3>
     <select #mySelect (change)='onOptionsSelected(mySelect.value)'>
       <option value="Select">Select....</option>
